@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const OrderValidationSchema = z.object({
+export const OrderValidationSchema = z.object({
   productName: z.string().min(1, 'Product name is required'),
   price: z.number().min(1, { message: 'Price must be greater than 0' }),
   quantity: z.number().int().positive('Quantity must be a positive integer'),
