@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { TUser } from './user.types';
+import { TOrder, TUser } from './user.types';
 import { User } from './user.model';
 import { UpdateQuery } from 'mongoose';
 
@@ -26,7 +27,7 @@ const getASingleUserFromDB = async (userId: number) => {
   const isUserExists = await User.isUserExists(userId);
 
   if (!isUserExists) {
-    throw new Error('User does not exists');
+    throw new Error('User not found');
   }
 
   const result = await User.findOne({ userId });
@@ -42,7 +43,7 @@ const updateUserInDB = async (
   const isUserExists = await User.isUserExists(userId);
 
   if (!isUserExists) {
-    throw new Error('User does not exists');
+    throw new Error('User not found');
   }
 
   const result = await User.findOneAndUpdate({ userId }, updatedData, {
@@ -57,11 +58,68 @@ const deleteAUserFromDB = async (userId: number) => {
   const isUserExists = await User.isUserExists(userId);
 
   if (!isUserExists) {
-    throw new Error('User does not exists');
+    throw new Error('User not found');
   }
   const result = await User.deleteOne({ userId });
 
   return result;
+};
+
+// User Order Related Services
+
+const updateUserOrderInDB = async (userId: number, order: TOrder) => {
+  // Check if User Exits
+  const isUserExists = await User.isUserExists(userId);
+  if (!isUserExists) {
+    throw new Error('User not found');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const response: any = await User.findOneAndUpdate(
+    { userId },
+    { $push: { orders: order } },
+    { new: true },
+  );
+
+  const { orders, ...result } = response.toObject();
+
+  return orders;
+};
+
+const getOrderDataForUser = async (userId: number) => {
+  // Check if User Exits
+  const isUserExists = await User.isUserExists(userId);
+
+  if (!isUserExists) {
+    throw new Error('User not found');
+  }
+
+  const response = await User.findOne({ userId });
+
+  const { orders, ...result } = (response as any).toObject();
+
+  return orders;
+};
+
+const getTotalPriceForUserFromDB = async (userId: number) => {
+  // Check if User Exits
+  const isUserExists = await User.isUserExists(userId);
+
+  if (!isUserExists) {
+    throw new Error('User not found');
+  }
+
+  const response = await User.findOne({ userId });
+
+  const { orders, ...result } = (response as any).toObject();
+
+  let totalPrice = 0;
+
+  orders.forEach((order: TOrder) => {
+    totalPrice += order.price * order.quantity;
+  });
+
+  return { totalPrice };
 };
 
 export const UserServices = {
@@ -70,4 +128,7 @@ export const UserServices = {
   getASingleUserFromDB,
   deleteAUserFromDB,
   updateUserInDB,
+  updateUserOrderInDB,
+  getOrderDataForUser,
+  getTotalPriceForUserFromDB,
 };
