@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
 import { Request, Response } from 'express';
 import { UserServices } from './user.service';
@@ -104,7 +105,6 @@ const updateUser = async (req: Request, res: Response) => {
 const deleteAUser = async (req: Request, res: Response) => {
   try {
     const userId = Number(req.params.id);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const result = await UserServices.deleteAUserFromDB(userId);
 
     res.status(200).json({
@@ -123,10 +123,81 @@ const deleteAUser = async (req: Request, res: Response) => {
   }
 };
 
+// User Order related controllers
+
+const updateUserOrder = async (req: Request, res: Response) => {
+  try {
+    const userId = Number(req.params.userId);
+    const order = req.body;
+    const result = await UserServices.updateUserOrderInDB(userId, order);
+
+    res.status(200).json({
+      success: true,
+      message: 'Order created successfully!',
+      data: null,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(400).json({
+      success: false,
+      message: 'There was an Error in adding order',
+      error: error,
+    });
+  }
+};
+
+const getOrderForUser = async (req: Request, res: Response) => {
+  try {
+    const userId = Number(req.params.userId);
+
+    const result = await UserServices.getOrderDataForUser(userId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Order fetched successfully!',
+      data: result,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(400).json({
+      success: false,
+      message: 'There was an Error in fetching order',
+      error: error,
+    });
+  }
+};
+
+const getTotalPriceForUser = async (req: Request, res: Response) => {
+  try {
+    const userId = Number(req.params.userId);
+
+    const result = await UserServices.getTotalPriceForUserFromDB(userId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Total price calculated successfully!',
+      data: result,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(400).json({
+      success: false,
+      message: 'There was an Error in fetching total price',
+      error: error,
+    });
+  }
+};
+
 export const userControllers = {
   createUser,
   getASingleUser,
   getAllUsers,
   updateUser,
   deleteAUser,
+  updateUserOrder,
+  getOrderForUser,
+  getTotalPriceForUser,
 };
