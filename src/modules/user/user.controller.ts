@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
 import { Request, Response } from 'express';
@@ -19,14 +20,16 @@ const createUser = async (req: Request, res: Response) => {
       message: 'User created successfully!',
       data: result,
     });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error(error);
 
     res.status(200).json({
       success: false,
       message: error.message || 'There was an Error in creating user',
-      error: error,
+      error: {
+        code: 404,
+        description: error.message || 'There was an Error in creating user',
+      },
     });
   }
 };
@@ -42,7 +45,7 @@ const getASingleUser = async (req: Request, res: Response) => {
       message: 'User fetched successfully!',
       data: result,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
 
     res.status(400).json({
@@ -50,7 +53,7 @@ const getASingleUser = async (req: Request, res: Response) => {
       message: 'User not found',
       error: {
         code: 404,
-        message: 'User not found',
+        description: error.message || 'User not found!',
       },
     });
   }
@@ -65,13 +68,16 @@ const getAllUsers = async (req: Request, res: Response) => {
       message: 'Users fetched successfully!',
       data: result,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
 
     res.status(400).json({
       success: false,
-      message: 'There was an Error in getting users',
-      error: error,
+      message: error.message || 'There was an Error in getting users',
+      error: {
+        code: 404,
+        description: error.message || 'There was an Error in getting users',
+      },
     });
   }
 };
@@ -91,20 +97,24 @@ const updateUser = async (req: Request, res: Response) => {
       message: 'User updated successfully!',
       data: result,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
 
     res.status(400).json({
       success: false,
-      message: 'There was an Error in updating user data',
-      error: error,
+      message: error.message || 'There was an Error in updating user data',
+      error: {
+        code: 404,
+        description:
+          error.message || 'There was an Error in updating user data',
+      },
     });
   }
 };
 
 const deleteAUser = async (req: Request, res: Response) => {
   try {
-    const userId = Number(req.params.id);
+    const userId = Number(req.params.userId);
     const result = await UserServices.deleteAUserFromDB(userId);
 
     res.status(200).json({
@@ -112,13 +122,16 @@ const deleteAUser = async (req: Request, res: Response) => {
       message: 'User deleted successfully!',
       data: null,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
 
     res.status(400).json({
       success: false,
-      message: 'There was an Error in deleting user',
-      error: error,
+      message: error.message || 'There was an Error in deleting user',
+      error: {
+        code: 404,
+        description: error.message || 'There was an Error in deleting user',
+      },
     });
   }
 };
@@ -136,13 +149,16 @@ const updateUserOrder = async (req: Request, res: Response) => {
       message: 'Order created successfully!',
       data: null,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
 
     res.status(400).json({
       success: false,
-      message: 'There was an Error in adding order',
-      error: error,
+      message: error.message || 'There was an Error in adding order',
+      error: {
+        code: 404,
+        description: error.message || 'There was an Error in adding order',
+      },
     });
   }
 };
@@ -158,13 +174,16 @@ const getOrderForUser = async (req: Request, res: Response) => {
       message: 'Order fetched successfully!',
       data: result,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
 
     res.status(400).json({
       success: false,
-      message: 'There was an Error in fetching order',
-      error: error,
+      message: error.message || 'There was an Error in fetching order',
+      error: {
+        code: 404,
+        description: error.message || 'There was an Error in fetching order',
+      },
     });
   }
 };
@@ -180,13 +199,17 @@ const getTotalPriceForUser = async (req: Request, res: Response) => {
       message: 'Total price calculated successfully!',
       data: result,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
 
     res.status(400).json({
       success: false,
-      message: 'There was an Error in fetching total price',
-      error: error,
+      message: error.message || 'There was an Error in fetching total price',
+      error: {
+        code: 404,
+        description:
+          error.message || 'There was an Error in fetching total price',
+      },
     });
   }
 };
