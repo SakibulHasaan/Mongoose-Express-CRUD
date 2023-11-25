@@ -27,7 +27,7 @@ const getASingleUserFromDB = async (userId: number) => {
   const isUserExists = await User.isUserExists(userId);
 
   if (!isUserExists) {
-    throw new Error('User not found');
+    throw new Error('User not found!');
   }
 
   const result = await User.findOne({ userId });
