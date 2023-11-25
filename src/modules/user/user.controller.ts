@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Request, Response } from 'express';
 import { UserServices } from './user.service';
 import { UserValidationSchema } from './user.validation';
@@ -17,6 +18,7 @@ const createUser = async (req: Request, res: Response) => {
       message: 'User created successfully!',
       data: result,
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error(error);
 
@@ -75,7 +77,7 @@ const getAllUsers = async (req: Request, res: Response) => {
 
 const updateUser = async (req: Request, res: Response) => {
   try {
-    const userId = req.params.userId;
+    const userId = Number(req.params.userId);
     const userDataFromRequest = req.body;
 
     const result = await UserServices.updateUserInDB(
@@ -101,8 +103,9 @@ const updateUser = async (req: Request, res: Response) => {
 
 const deleteAUser = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
-    const result = await UserServices.deleteAUserFromDB(id);
+    const userId = Number(req.params.id);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const result = await UserServices.deleteAUserFromDB(userId);
 
     res.status(200).json({
       success: true,

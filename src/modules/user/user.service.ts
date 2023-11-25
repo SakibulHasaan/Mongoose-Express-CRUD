@@ -1,6 +1,8 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { TUser } from './user.types';
 import { User } from './user.model';
-import { UserValidationSchema } from './user.validation';
+import { UpdateQuery } from 'mongoose';
 
 const createUserInDB = async (user: TUser) => {
   // Check if User Exits
@@ -9,12 +11,7 @@ const createUserInDB = async (user: TUser) => {
     throw new Error('User already exists');
   }
   const response = await User.create(user);
-  const result = response.toObject();
-  delete result.password;
-
-  if (result.orders?.length < 1) {
-    delete result.orders;
-  }
+  const { password, ...result } = response.toObject();
 
   return result;
 };
@@ -24,7 +21,7 @@ const getAllUsersFromDB = async () => {
   return result;
 };
 
-const getASingleUserFromDB = async userId => {
+const getASingleUserFromDB = async (userId: number) => {
   // Check if User Exits
   const isUserExists = await User.isUserExists(userId);
 
@@ -37,7 +34,10 @@ const getASingleUserFromDB = async userId => {
   return result;
 };
 
-const updateUserInDB = async (userId, updatedData) => {
+const updateUserInDB = async (
+  userId: number,
+  updatedData: UpdateQuery<TUser> | undefined,
+) => {
   // Check if User Exits
   const isUserExists = await User.isUserExists(userId);
 
@@ -52,7 +52,7 @@ const updateUserInDB = async (userId, updatedData) => {
   return result;
 };
 
-const deleteAUserFromDB = async userId => {
+const deleteAUserFromDB = async (userId: number) => {
   // Check if User Exits
   const isUserExists = await User.isUserExists(userId);
 
