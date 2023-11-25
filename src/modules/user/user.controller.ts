@@ -97,6 +97,10 @@ const updateUser = async (req: Request, res: Response) => {
       throw new Error('Please provide valid data');
     }
 
+    if (validatedData.data?.userId !== userId) {
+      throw new Error('User Id cannot be changed');
+    }
+
     const result = await UserServices.updateUserInDB(
       userId,
       validatedData.data,
