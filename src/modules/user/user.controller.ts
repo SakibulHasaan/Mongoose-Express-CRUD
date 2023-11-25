@@ -3,7 +3,10 @@
 /* eslint-disable no-unused-vars */
 import { Request, Response } from 'express';
 import { UserServices } from './user.service';
-import { UserValidationSchema } from './user.validation';
+import {
+  UserUpdateValidationSchema,
+  UserValidationSchema,
+} from './user.validation';
 
 const createUser = async (req: Request, res: Response) => {
   try {
@@ -87,9 +90,16 @@ const updateUser = async (req: Request, res: Response) => {
     const userId = Number(req.params.userId);
     const userDataFromRequest = req.body;
 
+    // Data validation using Zod
+    const validatedData =
+      UserUpdateValidationSchema.safeParse(userDataFromRequest);
+    if (!validatedData.success) {
+      throw new Error('Please provide valid data');
+    }
+
     const result = await UserServices.updateUserInDB(
       userId,
-      userDataFromRequest,
+      validatedData.data,
     );
 
     res.status(200).json({
