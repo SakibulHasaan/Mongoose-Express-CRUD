@@ -4,6 +4,7 @@
 import { Request, Response } from 'express';
 import { UserServices } from './user.service';
 import {
+  OrderValidationSchema,
   UserUpdateValidationSchema,
   UserValidationSchema,
 } from './user.validation';
@@ -51,7 +52,7 @@ const getASingleUser = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error(error);
 
-    res.status(400).json({
+    res.status(404).json({
       success: false,
       message: 'User not found',
       error: {
@@ -74,7 +75,7 @@ const getAllUsers = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error(error);
 
-    res.status(400).json({
+    res.status(404).json({
       success: false,
       message: error.message || 'There was an Error in getting users',
       error: {
@@ -90,15 +91,15 @@ const updateUser = async (req: Request, res: Response) => {
     const userId = Number(req.params.userId);
     const userDataFromRequest = req.body;
 
+    if (userDataFromRequest.userId && userDataFromRequest.userId !== userId) {
+      throw new Error('User Id cannot be changed');
+    }
+
     // Data validation using Zod
     const validatedData =
       UserUpdateValidationSchema.safeParse(userDataFromRequest);
     if (!validatedData.success) {
       throw new Error('Please provide valid data');
-    }
-
-    if (validatedData.data?.userId !== userId) {
-      throw new Error('User Id cannot be changed');
     }
 
     const result = await UserServices.updateUserInDB(
@@ -114,7 +115,7 @@ const updateUser = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error(error);
 
-    res.status(400).json({
+    res.status(404).json({
       success: false,
       message: error.message || 'There was an Error in updating user data',
       error: {
@@ -139,7 +140,7 @@ const deleteAUser = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error(error);
 
-    res.status(400).json({
+    res.status(404).json({
       success: false,
       message: error.message || 'There was an Error in deleting user',
       error: {
@@ -156,6 +157,12 @@ const updateUserOrder = async (req: Request, res: Response) => {
   try {
     const userId = Number(req.params.userId);
     const order = req.body;
+
+    const orderValidation = OrderValidationSchema.safeParse(order);
+    if (!orderValidation.success) {
+      throw new Error('Please provide valid order data');
+    }
+
     const result = await UserServices.updateUserOrderInDB(userId, order);
 
     res.status(200).json({
@@ -166,7 +173,7 @@ const updateUserOrder = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error(error);
 
-    res.status(400).json({
+    res.status(404).json({
       success: false,
       message: error.message || 'There was an Error in adding order',
       error: {
@@ -183,6 +190,10 @@ const getOrderForUser = async (req: Request, res: Response) => {
 
     const result = await UserServices.getOrderDataForUser(userId);
 
+    if (result?.length === 0) {
+      throw new Error('User currently has no orders');
+    }
+
     res.status(200).json({
       success: true,
       message: 'Order fetched successfully!',
@@ -191,7 +202,7 @@ const getOrderForUser = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error(error);
 
-    res.status(400).json({
+    res.status(404).json({
       success: false,
       message: error.message || 'There was an Error in fetching order',
       error: {
@@ -216,7 +227,7 @@ const getTotalPriceForUser = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error(error);
 
-    res.status(400).json({
+    res.status(404).json({
       success: false,
       message: error.message || 'There was an Error in fetching total price',
       error: {
